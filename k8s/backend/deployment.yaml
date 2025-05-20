@@ -18,14 +18,8 @@ spec:
         ports:
         - containerPort: 8000
         env:
-        - name: DB_HOST
-          value: "postgres"
-        - name: DB_USER
-          value: "postgres"
-        - name: DB_PASSWORD
-          value: "postgres"
-        - name: DB_NAME
-          value: "postgres"
+        - name: DATABASE_URL
+          value: "postgres://postgres:postgres@postgres:5432/postgres?sslmode=disable"
         resources:
           requests:
             memory: "128Mi"
