@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: ck117/goapp:1.0.0
+        image: chirag117/goapp:1.0.0
         ports:
         - containerPort: 8000
         env:

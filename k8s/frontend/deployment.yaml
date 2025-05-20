@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: nextapp:1.0.0
+        image: chirag117/nextapp:1.0.0
         ports:
         - containerPort: 3000
         env:
