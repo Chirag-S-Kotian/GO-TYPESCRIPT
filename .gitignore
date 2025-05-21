@@ -5,3 +5,4 @@ go.sum
 *.tfstate
 *.tfstate.*
 infra/terraform.tfvars
+.terraform/providers/registry.terraform.io/hashicorp/google/6.36.0/linux_amd64.terraform/
