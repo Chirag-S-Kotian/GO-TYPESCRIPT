@@ -24,9 +24,11 @@ data:
     global:
       scrape_interval: 15s
     scrape_configs:
-      - job_name: 'kubernetes'
+      - job_name: 'backend'
         static_configs:
           - targets: ['backend.default.svc.cluster.local:8000']
+      - job_name: 'frontend'
+        static_configs:
           - targets: ['frontend.default.svc.cluster.local:3000']
 ---
 apiVersion: apps/v1
