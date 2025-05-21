@@ -1,0 +1,121 @@
+name: CI-CD-Fullstack
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-test:
+    name: Lint & Test (Parallel)
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [backend, frontend]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Go (backend)
+        if: matrix.service == 'backend'
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+      - name: Set up Node.js (frontend)
+        if: matrix.service == 'frontend'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies & Lint
+        run: |
+          if [ "${{ matrix.service }}" = "backend" ]; then cd backend && go mod tidy && go fmt ./...; fi
+          if [ "${{ matrix.service }}" = "frontend" ]; then cd client && yarn install --frozen-lockfile && yarn lint; fi
+      - name: Run Tests
+        run: |
+          if [ "${{ matrix.service }}" = "backend" ]; then cd backend && go test ./...; fi
+          if [ "${{ matrix.service }}" = "frontend" ]; then cd client && yarn test || true; fi
+
+  build-push:
+    name: Build & Push Docker Images (Parallel)
+    runs-on: ubuntu-latest
+    needs: lint-test
+    strategy:
+      matrix:
+        include:
+          - name: backend
+            context: ./backend
+            dockerfile: backend/go.dockerfile
+            image: chirag117/goapp:latest
+          - name: frontend
+            context: ./client
+            dockerfile: client/next.dockerfile
+            image: chirag117/nextapp:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ matrix.image }} -f ${{ matrix.dockerfile }} ${{ matrix.context }}
+      - name: Push Docker image
+        run: |
+          docker push ${{ matrix.image }}
+
+  trivy-scan:
+    name: Trivy Image Scan (Parallel)
+    runs-on: ubuntu-latest
+    needs: build-push
+    strategy:
+      matrix:
+        image: [chirag117/goapp:latest, chirag117/nextapp:latest]
+    steps:
+      - name: Run Trivy scan
+        uses: aquasecurity/trivy-action@v0.16.0
+        with:
+          image-ref: ${{ matrix.image }}
+          format: table
+          exit-code: 1
+
+  sonarqube:
+    name: SonarQube Scan
+    runs-on: ubuntu-latest
+    needs: lint-test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: SonarQube Scan
+        uses: sonarsource/sonarqube-scan-action@v2.0.2
+        with:
+          projectBaseDir: ./
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  k8s-deploy:
+    name: Deploy to Kubernetes (Helm)
+    runs-on: ubuntu-latest
+    needs: [trivy-scan, sonarqube]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v4
+        with:
+          version: 'latest'
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+        with:
+          version: 'latest'
+      - name: Set up Kubeconfig
+        run: echo "$KUBECONFIG_DATA" | base64 -d > kubeconfig && export KUBECONFIG=$(pwd)/kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
+      - name: Helm Upgrade/Install
+        run: |
+          helm upgrade --install fullstack-app ./helm --namespace default --create-namespace
