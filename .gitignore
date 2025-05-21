@@ -4,3 +4,4 @@ go.sum
 .tfvars
 *.tfstate
 *.tfstate.*
+infra/terraform.tfvars
