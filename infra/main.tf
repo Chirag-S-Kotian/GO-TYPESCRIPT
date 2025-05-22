@@ -23,7 +23,7 @@ resource "google_container_node_pool" "primary_nodes" {
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform"
     ]
-    disk_size_gb = 30
+    disk_size_gb = 10
   }
 }
 
