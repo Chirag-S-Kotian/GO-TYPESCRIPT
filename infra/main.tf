@@ -57,11 +57,11 @@ resource "google_sql_database_instance" "postgres" {
 resource "google_sql_user" "postgres" {
   name     = "postgres"
   instance = google_sql_database_instance.postgres.name
-  password_wo = var.db_password
+  password = var.db_password
 }
 
 resource "google_sql_database" "app_db" {
-  name     = "postgres"
+  name     = "app_db"
   instance = google_sql_database_instance.postgres.name
 }
 
