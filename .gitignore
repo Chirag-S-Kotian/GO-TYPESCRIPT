@@ -9,3 +9,4 @@ infra/terraform.tfvars
 infra/.terraform/providers/registry.terraform.io/hashicorp/google/6.36.0/linux_amd64/terraform-provider-google_v6.36.0_x5
 
 infra/.terraform
+infra/variables.tfvars
