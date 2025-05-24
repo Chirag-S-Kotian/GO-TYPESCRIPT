@@ -4,51 +4,68 @@ provider "google" {
   zone    = var.zone
 }
 
-resource "google_compute_network" "default" {
-  name                    = "default"
-  auto_create_subnetworks = true
-}
-
-resource "google_compute_firewall" "default-allow-app-ports" {
-  name    = "default-allow-app-ports"
-  network = google_compute_network.default.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["3000", "8000"]
-  }
-
-  direction     = "INGRESS"
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["app-server"]
-}
-
 resource "google_compute_instance" "app_vm" {
   name         = "app-vm"
   machine_type = "e2-medium"
+  zone         = var.zone
+  tags         = ["http-server", "https-server"]
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-11"
+      image = "ubuntu-2204-lts"
     }
   }
 
   network_interface {
-    network       = google_compute_network.default.name
-    access_config {}
+    network = "default"
+    access_config {} # for external IP
   }
-
-  tags = ["app-server"]
 
   metadata_startup_script = <<-EOT
     #!/bin/bash
     apt-get update -y
-    apt-get install -y docker.io docker-compose git
-    usermod -aG docker google
-    cd /home/google
-    git clone ${var.repo_url} app
-    cd app
-    mv compose.yaml docker-compose.yml
-    docker-compose up -d
+
+    # Install Docker
+    apt-get install -y \
+      ca-certificates \
+      curl \
+      gnupg \
+      lsb-release
+
+    mkdir -p /etc/apt/keyrings
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+      gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+    echo \
+      "deb [arch=$(dpkg --print-architecture) \
+      signed-by=/etc/apt/keyrings/docker.gpg] \
+      https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+    apt-get update -y
+    apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    usermod -aG docker $USER
+
+    # Clone repo and run app
+    cd /home/$USER
+    git clone ${var.repo_url} GO-TYPESCRIPT
+    cd GO-TYPESCRIPT
+    mv compose.yaml docker-compose.yaml
+
+    docker compose up -d
   EOT
+}
+
+resource "google_compute_firewall" "allow_http_https" {
+  name    = "allow-http-https"
+  network = "default"
+
+  allow {
+    protocol = "tcp"
+    ports    = ["80", "443", "3000", "8000"]
+  }
+
+  source_ranges = ["0.0.0.0/0"]
+  target_tags   = ["http-server", "https-server"]
 }
