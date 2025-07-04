@@ -76,6 +76,7 @@ compose.yaml# Docker Compose for local dev
    kubectl apply -f k8s/frontend/service.yaml
    ```
 
+
 ## 🔒 DevSecOps Ready
 - **CI/CD**: GitHub Actions templates ready
 - **Security**: SAST, container scanning, secrets management
