@@ -23,6 +23,7 @@ A modern, production-ready full stack application with:
 - **Docker** & **Kubernetes** ready
 - Designed for **DevSecOps**: CI/CD, SAST, container scanning, GitOps, and cloud-native deployment
 
+
 ---
 
 
