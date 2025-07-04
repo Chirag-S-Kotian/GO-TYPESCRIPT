@@ -7,6 +7,7 @@
 </p>
 
 <p align="center">
+
   <a href="https://github.com/ck117/devsecops-boilerplate/actions"><img src="https://github.com/ck117/devsecops-boilerplate/workflows/CI/badge.svg" alt="CI Status"></a>
   <a href="https://github.com/ck117/devsecops-boilerplate/blob/main/LICENSE"><img src="https://img.shields.io/github/license/ck117/devsecops-boilerplate.svg" alt="License"></a>
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs Welcome">
