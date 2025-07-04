@@ -33,6 +33,7 @@ A modern, production-ready full stack application with:
 - Persistent database storage
 - Ready for GitHub Actions, ArgoCD, Helm, Prometheus, Grafana, Terraform
 
+
 ## 🗂️ Project Structure
 ```
 backend/    # Go REST API
