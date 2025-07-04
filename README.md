@@ -61,6 +61,7 @@ compose.yaml# Docker Compose for local dev
    - Backend: http://localhost:8000
    - DB: localhost:5432 (user/pass: postgres)
 
+
 ## ☸️ Kubernetes Deployment
 1. **Push your images** to Docker Hub or GCR
 2. **Update image fields** in `k8s/*/deployment.yaml`
