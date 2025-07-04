@@ -24,6 +24,7 @@ A modern, production-ready full stack application with:
 
 ---
 
+
 ## 🚀 Features
 - Modular codebase: `backend/` (Go), `client/` (Next.js), `k8s/` (Kubernetes manifests)
 - Local development with Docker Compose
