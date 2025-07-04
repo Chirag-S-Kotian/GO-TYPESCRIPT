@@ -15,6 +15,7 @@
 
 ---
 
+
 A modern, production-ready full stack application with:
 - **Go REST API** backend
 - **Next.js** frontend
