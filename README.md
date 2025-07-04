@@ -84,6 +84,7 @@ compose.yaml# Docker Compose for local dev
 - **GitOps**: ArgoCD & Helm compatible
 - **IaC**: Terraform for GCP infra (see `/iac` if present)
 
+
 ## 🤝 Contributing
 - Fork the repo and create your branch from `main`
 - Open a pull request with a clear description
