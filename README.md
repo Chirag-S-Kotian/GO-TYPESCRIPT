@@ -10,6 +10,7 @@
 
 
 
+
 # DevSecOps-Ready Full Stack Boilerplate
 <p align="center">
   <img src="client/public/gologo.svg" alt="Go Logo" width="60"/>
